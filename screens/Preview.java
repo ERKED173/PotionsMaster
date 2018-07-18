@@ -2,6 +2,7 @@ package ru.erked.pcook.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
@@ -29,7 +30,7 @@ public class Preview extends AdvScreen {
     public void show () {
         //
         /*  Initialisation of main game ru.erked.pcook.systems. */
-        g.prefs = Gdx.app.getPreferences("potions_cook_preferences");
+        g.prefs = Gdx.app.getPreferences("potions_master_preferences");
         g.lang = g.prefs.getInteger("language", 0);
         g.atlas = new TextureAtlas("textures/textures.atlas");
         g.textSystem = new TextSystem(g.lang);
@@ -66,15 +67,23 @@ public class Preview extends AdvScreen {
         g.music_volume = g.prefs.getFloat("music_volume", 1f);
         g.sound_volume = g.prefs.getFloat("sound_volume", 1f);
 
-        g.day = g.prefs.getInteger("day", 1);
+        g.week = g.prefs.getInteger("week", 1);
         g.money = g.prefs.getInteger("money", 0);
-        g.potion_cooked = g.prefs.getInteger("potion_cooked", 0);
+        g.potions_cooked = g.prefs.getInteger("potion_cooked", 0);
 
-        for (int i = 0; i < g.potion_cooked; ++i) {
+        g.is_potion_cooked = false;
+        g.potion_color = new Color();
+
+        for (int i = 0; i < g.potions_cooked; ++i) {
             String[] p_h = g.prefs.getString("potion_history_" + i, "").split(" ");
             g.potions.list.add(new Potion(
                     new String[] {p_h[4], p_h[5], p_h[6], p_h[7]},
-                    new int[] {Integer.parseInt(p_h[0]), Integer.parseInt(p_h[1]), Integer.parseInt(p_h[2]), Integer.parseInt(p_h[3])},
+                    new int[] {
+                            Integer.parseInt(p_h[0]),
+                            Integer.parseInt(p_h[1]),
+                            Integer.parseInt(p_h[2]),
+                            Integer.parseInt(p_h[3])
+                    },
                     Integer.parseInt(p_h[8]),
                     Integer.parseInt(p_h[9])
             ));

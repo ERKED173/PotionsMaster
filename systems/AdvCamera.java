@@ -13,7 +13,8 @@ public class AdvCamera extends Actor {
         camera = new OrthographicCamera(getWidth(), getHeight());
     }
 
-    public void update () {
+    public void act (float delta) {
+        super.act(delta);
         camera.position.x = getX();
         camera.position.y = getY();
         camera.viewportWidth = getWidth();

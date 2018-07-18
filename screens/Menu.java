@@ -101,6 +101,7 @@ public class Menu extends AdvScreen {
 
         /* ESC listener */
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) { this.dispose(); Gdx.app.exit(); }
+        if (Gdx.input.isKeyPressed(Input.Buttons.BACK)) { this.dispose(); Gdx.app.exit(); }
         //
     }
 
@@ -163,7 +164,7 @@ public class Menu extends AdvScreen {
                 g,
                 .875f * g.w,
                 .025f * g.w,
-                .4f * g.w,
+                .35f * g.w,
                 g.fonts.f_5.getFont(),
                 g.textSystem.get("exit_btn"),
                 1,
@@ -185,7 +186,7 @@ public class Menu extends AdvScreen {
                 g,
                 .875f * g.w,
                 .085f * g.w,
-                .4f * g.w,
+                .35f * g.w,
                 g.fonts.f_5.getFont(),
                 g.textSystem.get("about_btn"),
                 1,
@@ -209,7 +210,7 @@ public class Menu extends AdvScreen {
                 g,
                 .875f * g.w,
                 .145f * g.w,
-                .4f * g.w,
+                .35f * g.w,
                 g.fonts.f_5.getFont(),
                 g.textSystem.get("options_btn"),
                 1,
@@ -233,7 +234,7 @@ public class Menu extends AdvScreen {
                 g,
                 .875f * g.w,
                 .205f * g.w,
-                .4f * g.w,
+                .35f * g.w,
                 g.fonts.f_5.getFont(),
                 g.textSystem.get("start_btn"),
                 1,
@@ -246,20 +247,45 @@ public class Menu extends AdvScreen {
                     if (g.is_sound) g.sounds.click.play(g.sound_volume); // Click sound
                     if (g.sounds.music_1.isPlaying()) g.sounds.music_1.stop();
                     change_screen = true;
-                    next_screen = new Game(g);
+                    next_screen = new FightAI(g);
                     start.get().setChecked(false);
                     for (Actor act : stage.getActors()) act.addAction(Actions.alpha(0f, .5f));
                 }
             }
         });
 
+        /* --1 VS 1-- */
+        Button one_vs_one = new Button(
+                g,
+                .875f * g.w,
+                .205f * g.w,
+                .35f * g.w,
+                g.fonts.f_5.getFont(),
+                g.textSystem.get("one_vs_one"),
+                1,
+                "one_vs_one"
+        );
+        one_vs_one.get().addListener(new ClickListener(){
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                if (!change_screen) {
+                    if (g.is_sound) g.sounds.click.play(g.sound_volume);
+                    change_screen = true;
+                    next_screen = new FightParams(g);
+                    one_vs_one.get().setChecked(false);
+                    for (Actor act : stage.getActors()) act.addAction(Actions.alpha(0f, .5f));
+                }
+            }
+        });
+
         buttons.add(start);
+        buttons.add(one_vs_one);
         buttons.add(options);
         buttons.add(about);
         buttons.add(exit);
 
         /*-- Button position calculation --*/
-        float center_height = .4f * g.h;
+        float center_height = .45f * g.h;
         if (buttons.size() % 2 == 0) {
             float margin = ((int)(buttons.size() / 2f)) * .55f*buttons.get(0).get().getHeight();
             float x_pos = .5f * g.w - .5f*buttons.get(0).get().getWidth();
@@ -285,6 +311,15 @@ public class Menu extends AdvScreen {
         stage.addActor(version);
         for (Button b : buttons) stage.addActor(b.get());
         //
+    }
+
+    @Override
+    public void resume() {
+        if (g.is_music) {
+            g.sounds.music_1.setLooping(true);
+            g.sounds.music_1.setVolume(g.music_volume);
+            g.sounds.music_1.play();
+        }
     }
 
 }

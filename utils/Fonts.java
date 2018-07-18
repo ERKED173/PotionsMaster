@@ -6,10 +6,12 @@ import ru.erked.pcook.systems.Font;
 
 public class Fonts {
 
+    public Font f_20;
     public Font f_15;
     public Font f_15S;
     public Font f_15Black;
     public Font f_10;
+    public Font f_10S;
     public Font f_10Black;
     public Font f_5;
     public Font f_5S;
@@ -19,10 +21,12 @@ public class Fonts {
 
     public Fonts (String FONT_CHARS) {
         int min_size = 25;
+        f_20 = new Font("fonts/regular.ttf", min_size + 20, Color.WHITE, FONT_CHARS);
         f_15 = new Font("fonts/regular.ttf", min_size + 15, Color.WHITE, FONT_CHARS);
-        f_15S = new Font("fonts/regular.ttf", min_size + 15, Color.WHITE, 3, 3, Color.BLACK, FONT_CHARS);
+        f_15S = new Font("fonts/regular.ttf", min_size + 15, Color.WHITE, 2, 2, Color.BLACK, FONT_CHARS);
         f_15Black = new Font("fonts/regular.ttf", min_size + 15, Color.BLACK, FONT_CHARS);
         f_10 = new Font("fonts/regular.ttf", min_size + 10, Color.WHITE, FONT_CHARS);
+        f_10S = new Font("fonts/regular.ttf", min_size + 10, Color.WHITE, 3, 3, Color.BLACK, FONT_CHARS);
         f_10Black = new Font("fonts/regular.ttf", min_size + 10, Color.BLACK, FONT_CHARS);
         f_5 = new Font("fonts/regular.ttf", min_size + 5, Color.WHITE, FONT_CHARS);
         f_5S = new Font("fonts/regular.ttf", min_size + 5, Color.WHITE, 4, 4, Color.BLACK, FONT_CHARS);

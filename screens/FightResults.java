@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -17,28 +16,39 @@ import ru.erked.pcook.GameStarter;
 import ru.erked.pcook.systems.AdvScreen;
 import ru.erked.pcook.systems.AdvSprite;
 import ru.erked.pcook.systems.Button;
-import ru.erked.pcook.systems.InGameText;
+import ru.erked.pcook.systems.TextLine;
 
-public class About extends AdvScreen {
+public class FightResults extends AdvScreen {
 
     /* Sprites */
     private Animation<TextureRegion> background_anim;
     private ArrayList<AdvSprite> background;
-    private AdvSprite rhombus;
 
     /* Buttons */
-    private Button back;
+    private Button ok;
 
     /* Text */
-    private InGameText captions;
+    private TextLine turns;
+    private TextLine winner;
+    private TextLine ai_score;
+    private TextLine player_score;
+    private TextLine game_results;
 
     /* Random */
     private float state_time = 0f; // For all animations
     private final int RHOMBUSES = 10; // Background
+    private int turns_num;
+    private int score_ai;
+    private int score_player;
 
-    About (GameStarter game) {
+    FightResults (GameStarter game, int score_ai, int score_player, int turns) {
         //
         super(game);
+
+        this.score_ai = score_ai;
+        this.score_player = score_player;
+        turns_num = turns;
+
         //
     }
 
@@ -70,6 +80,8 @@ public class About extends AdvScreen {
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        g.sounds.music_1.setVolume(g.music_volume);
+
         state_time += delta;
 
         /* Transition btw screens */
@@ -82,24 +94,7 @@ public class About extends AdvScreen {
             }
         }
 
-        /* Move rhombus & text_h using cursor */
-        if (Gdx.input.isTouched()) {
-            rhombus.addAction(Actions.moveBy(0f, -Gdx.input.getDeltaY()));
-            captions.addAction(Actions.moveBy(0f, -Gdx.input.getDeltaY()));
-            captions.updatePos(0f);
-        }
-
-        /* Teleportation of rhombus & text_h */
-        if (captions.getY() > 1.4f * g.h) {
-            captions.addAction(Actions.moveBy(0f, -2.05f * g.h));
-            rhombus.setY(rhombus.getY() - 2.05f * g.h);
-        }
-        if (captions.getY() + captions.getHeight() < -0.05f * g.h) {
-            captions.addAction(Actions.moveBy(0f,2.05f * g.h));
-            rhombus.setY(rhombus.getY() + 2.05f * g.h);
-        }
-
-        /* Teleportation of rhombs */
+        /* Teleportation of rhombuses */
         for (AdvSprite s : background) {
             if (s.getX() < -g.w / 4f) {
                 s.setX(s.getX() + (g.w / 4f) * RHOMBUSES);
@@ -111,28 +106,63 @@ public class About extends AdvScreen {
         }
 
         /* Animation */
-        for (AdvSprite s : background) { s.getSprite().setRegion(background_anim.getKeyFrame(state_time, true)); }
+        for (AdvSprite s : background) {s.getSprite().setRegion(background_anim.getKeyFrame(state_time, true));}
 
         stage.act(delta);
         stage.draw();
 
-        /* ESC listener */
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) { this.dispose(); Gdx.app.exit(); }
-        if (Gdx.input.isKeyPressed(Input.Buttons.BACK)) {
-            change_screen = true;
-            next_screen = new Menu(g);
-            for (Actor act : stage.getActors()) act.addAction(Actions.alpha(0f, 0.5f));
-        }
+        /* ESC listener. */
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) { this.dispose();Gdx.app.exit(); }
         //
     }
 
     private void text_initialization() {
         //
-        captions = new InGameText(g, g.fonts.f_5S, new String[]{
-                "captions_1","captions_2","captions_3","captions_4","captions_5","captions_6",
-                "captions_7","captions_8","captions_9","captions_10","captions_11","captions_12",
-                "captions_13","captions_14"
-        }, new int[]{0,2,3,5,6,8,9,10,12,13,14,15,16,18}, true);
+        game_results = new TextLine(
+                g.fonts.f_0S,
+                g.textSystem.get("game_results"),
+                0f,
+                0.9f * g.h
+        );
+        game_results.setX(0.5f * (g.w - game_results.getWidth()));
+
+        String win_text = (score_ai == score_player) ?
+                (g.textSystem.get("draw")) :
+                (g.textSystem.get("winner") + " " +
+                        (score_player > score_ai ?
+                                (g.textSystem.get("blue_player")) :
+                                (g.textSystem.get("red_player"))));
+        winner = new TextLine(
+                g.fonts.f_5S,
+                win_text,
+                0f,
+                0.75f * g.h
+        );
+        winner.setX(0.5f * (g.w - winner.getWidth()));
+
+        ai_score = new TextLine(
+                g.fonts.f_5S,
+                g.textSystem.get("red_player_score") + ": " + score_ai,
+                0f,
+                0.6f * g.h
+        );
+        ai_score.setX(0.5f * (g.w - ai_score.getWidth()));
+
+        player_score = new TextLine(
+                g.fonts.f_5S,
+                g.textSystem.get("blue_player_score") + ": " + score_player,
+                0f,
+                0.5f * g.h
+        );
+        player_score.setX(0.5f * (g.w - player_score.getWidth()));
+
+        turns = new TextLine(
+                g.fonts.f_5S,
+                g.textSystem.get("turns") + ": " + turns_num,
+                0f,
+                0.4f * g.h
+        );
+        turns.setX(0.5f * (g.w - turns.getWidth()));
         //
     }
     private void texture_initialization() {
@@ -149,46 +179,33 @@ public class About extends AdvScreen {
             background.get(i).addAction(Actions.forever(Actions.moveBy(-(g.w / 4f), (g.w / 4f), 5f)));
         }
 
-        rhombus = new AdvSprite(
-                g.atlas.createSprite("rhombus"),
-                0.375f * g.w,
-                -0.275f * g.w,
-                0.25f * g.w,
-                0.25f * g.w
-        );
-        rhombus.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (g.is_sound) g.sounds.s_list.get(MathUtils.random(g.sounds.s_list.size() - 1)).play(g.sound_volume);
-            }
-        });
-
         background_anim = new Animation<>(
                 0.09375f,
                 g.atlas.findRegions("background"),
                 Animation.PlayMode.LOOP_PINGPONG);
+
         //
     }
     private void button_initialization() {
         //
         /* --BACK-- */
-        back = new Button(
+        ok = new Button(
                 g,
                 0.675f * g.w,
                 0.025f * g.w,
                 0.3f * g.w,
                 g.fonts.f_5.getFont(),
-                g.textSystem.get("back_btn"),
+                g.textSystem.get("ok_btn"),
                 1,
-                "back_btn"
+                "ok_btn"
         );
-        back.get().addListener(new ClickListener(){
+        ok.get().addListener(new ClickListener(){
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 if (g.is_sound) g.sounds.click.play(g.sound_volume); // Click sound
                 change_screen = true;
                 next_screen = new Menu(g);
-                back.get().setChecked(false);
+                ok.get().setChecked(false);
                 for (Actor act : stage.getActors()) act.addAction(Actions.alpha(0f, 0.5f));
             }
         });
@@ -198,9 +215,12 @@ public class About extends AdvScreen {
     private void stage_addition () {
         //
         for (AdvSprite s : background) stage.addActor(s);
-        stage.addActor(rhombus);
-        stage.addActor(captions);
-        stage.addActor(back.get());
+        stage.addActor(ok.get());
+        stage.addActor(game_results);
+        stage.addActor(winner);
+        stage.addActor(ai_score);
+        stage.addActor(player_score);
+        stage.addActor(turns);
         //
     }
 

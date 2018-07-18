@@ -10,7 +10,7 @@ import ru.erked.pcook.GameStarter;
 
 public class AdvParticle extends Actor {
 
-    public enum Type {LINE, SINGLE, CIRCLE}
+    public enum Type {LINE, POINT, CIRCLE}
 
     private ParticleEffectPool.PooledEffect pooled_effect;
     private ParticleEffectPool particle_pool;
@@ -29,7 +29,7 @@ public class AdvParticle extends Actor {
                 pooled_effect.scaleEffect(scale);
                 break;
             }
-            case SINGLE: {
+            case POINT: {
                 scale = width / effect.getEmitters().first().getXScale().getHighMax();
                 pooled_effect.scaleEffect(scale);
                 break;
@@ -61,10 +61,12 @@ public class AdvParticle extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        float temp[] = pooled_effect.getEmitters().first().getTint().getColors();
-        temp[0] = getColor().r;
-        temp[1] = getColor().g;
-        temp[2] = getColor().b;
+        if (!(getColor().r == 1 && getColor().g == 1 && getColor().b == 1)) {
+            float temp[] = pooled_effect.getEmitters().first().getTint().getColors();
+            temp[0] = getColor().r;
+            temp[1] = getColor().g;
+            temp[2] = getColor().b;
+        }
         if (!pooled_effect.isComplete()) pooled_effect.draw(batch, Gdx.graphics.getDeltaTime());
     }
 

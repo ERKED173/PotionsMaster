@@ -13,6 +13,9 @@ public class Sounds {
     public Sound click;
     public Sound harp;
     public Sound cooking;
+    public Sound explosion;
+    public Sound gem_click;
+    public Sound gem_place;
     public Sound cooking_power;
 
     /* Wizard */
@@ -39,6 +42,9 @@ public class Sounds {
         harp = Gdx.audio.newSound(Gdx.files.internal("sounds/random/harp.wav"));
         cooking = Gdx.audio.newSound(Gdx.files.internal("sounds/random/cooking.wav"));
         cooking_power = Gdx.audio.newSound(Gdx.files.internal("sounds/random/cooking_power.wav"));
+        gem_click = Gdx.audio.newSound(Gdx.files.internal("sounds/random/gem_click.wav"));
+        gem_place = Gdx.audio.newSound(Gdx.files.internal("sounds/random/gem_place.wav"));
+        explosion = Gdx.audio.newSound(Gdx.files.internal("sounds/random/explosion.wav"));
 
         wizard_touch = new Sound[3];
         for (int i = 0; i < wizard_touch.length; ++i) wizard_touch[i] = Gdx.audio.newSound(Gdx.files.internal("sounds/wizard/touch_" + (i + 1) + ".wav"));
@@ -55,6 +61,8 @@ public class Sounds {
         s_list.add(harp);
         s_list.add(cooking);
         s_list.add(cooking_power);
+        s_list.add(explosion);
+        s_list.add(gem_click);
         s_list.addAll(Arrays.asList(wizard_touch));
 
         m_list.add(music_1);

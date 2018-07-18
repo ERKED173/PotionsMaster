@@ -28,6 +28,9 @@ public class GameStarter extends Game {
 	public float pixel_size;
 	public float tile_size;
 
+	public boolean is_potion_cooked;
+	public Color potion_color;
+
 	/* Values to memorise */
 	public boolean is_sound = true;
 	public boolean is_music = true;
@@ -35,10 +38,12 @@ public class GameStarter extends Game {
 	public float music_volume = 1f; // From 0f to 1f
 	public float sound_volume = 1f; // From 0f to 1f
 
-	public int day = 1;
+	public int week = 1;
 	public int money = 0;
 
-	public int potion_cooked = 0;
+	public int fight_board_size = 10;
+
+	public int potions_cooked = 0;
 
 	public GameStarter(int lang) { this.lang = lang; }
 

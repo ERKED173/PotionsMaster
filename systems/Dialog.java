@@ -4,7 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+
+import java.util.ArrayList;
 
 import ru.erked.pcook.GameStarter;
 
@@ -12,22 +16,29 @@ public class Dialog extends AdvSprite {
 
     private AdvSprite picture;
     private Animation<TextureRegion> picture_anim;
-    private boolean is_displayed = true;
     private InGameText text;
-    private Button[] buttons;
+    private ArrayList<Button> buttons = new ArrayList<>();
     private float state_time = 0f;
 
-    public Dialog (GameStarter game, float x, float y, float width, String key, boolean is_key, String[] text_btn, ClickListener[] listeners) {
+    public Dialog (GameStarter game, float x, float y, float width, String key, boolean is_key, String back_btn) {
         super(game.atlas.createSprite("dialog"), x, y, width, 0.5f * width);
-        text = new InGameText(game, game.fonts.f_15S, key, 0.9f*width, x + 0.05f*width, y + 0.2f*width, is_key);
-        addButtons(game, text_btn, listeners);
+        text = new InGameText(game, game.fonts.f_10S, key, 0.9f*width, x + 0.05f*width, y + 0.2f*width, is_key);
+        text.setY(getY() + .875f*getHeight() - text.getHeight());
+        text.updatePos(0f);
+        addButton(game, back_btn, new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (game.is_sound) game.sounds.click.play(game.sound_volume);
+                close();
+            }
+        });
     }
 
-    public Dialog (GameStarter game, float width, String key, boolean is_key, String[] text_btn, ClickListener[] listeners) {
-        this(game, 0.5f*(game.w - width), 0.5f*(game.h - 0.5f*width), width, key, is_key, text_btn, listeners);
+    public Dialog (GameStarter game, float width, String key, boolean is_key, String back_btn) {
+        this(game, 0.5f*(game.w - width), 0.5f*(game.h - 0.5f*width), width, key, is_key, back_btn);
     }
 
-    public Dialog (GameStarter game, float x, float y, float width, String key, boolean is_key, String picture, String[] text_btn, ClickListener[] listeners) {
+    public Dialog (GameStarter game, float x, float y, float width, String key, boolean is_key, String picture, String back_btn) {
         super(game.atlas.createSprite("picture_dialog"), x, y, width, width);
         float picture_height = 0.5f * width;
         float picture_width = picture_height * (game.atlas.createSprite(picture).getWidth() / game.atlas.createSprite(picture).getHeight());
@@ -39,15 +50,21 @@ public class Dialog extends AdvSprite {
                 picture_height
         );
         text = new InGameText(game, game.fonts.f_15S, key, 0.9f*width, x + 0.05f*width, y + 0.2f*width, is_key);
-        addButtons(game, text_btn, listeners);
+        addButton(game, back_btn, new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (game.is_sound) game.sounds.click.play(game.sound_volume);
+                close();
+            }
+        });
     }
 
-    public Dialog (GameStarter game, float width, String key, boolean is_key, String picture, String[] text_btn, ClickListener[] listeners) {
-        this(game, 0.5f*(game.w - width), 0.5f*(game.h - 0.5f*width), width, key, is_key, picture, text_btn, listeners);
+    public Dialog (GameStarter game, float width, String key, boolean is_key, String picture, String back_btn) {
+        this(game, 0.5f*(game.w - width), 0.5f*(game.h - 0.5f*width), width, key, is_key, picture, back_btn);
     }
 
-    public Dialog (GameStarter game, float x, float y, float width, String key, boolean is_key, String picture, float duration, Animation.PlayMode playmode, String[] text_btn, ClickListener[] listeners) {
-        this(game, x, y, width, key, is_key, picture, text_btn, listeners);
+    public Dialog (GameStarter game, float x, float y, float width, String key, boolean is_key, String picture, float duration, Animation.PlayMode playmode, String back_btn) {
+        this(game, x, y, width, key, is_key, picture, back_btn);
         picture_anim = new Animation<>(
                 duration,
                 game.atlas.findRegions(picture),
@@ -55,28 +72,40 @@ public class Dialog extends AdvSprite {
         );
     }
 
-    public Dialog (GameStarter game, float width, String key, boolean is_key, String picture, float duration, Animation.PlayMode playmode, String[] text_btn, ClickListener[] listeners) {
-        this(game, 0.5f*(game.w - width), 0.5f*(game.h - width), width, key, is_key, picture, duration, playmode, text_btn, listeners);
+    public Dialog (GameStarter game, float width, String key, boolean is_key, String picture, float duration, Animation.PlayMode playmode, String back_btn) {
+        this(game, 0.5f*(game.w - width), 0.5f*(game.h - width), width, key, is_key, picture, duration, playmode, back_btn);
     }
 
-    private void addButtons (GameStarter game, String[] text_btn, ClickListener[] listeners) {
-        buttons = new Button[text_btn.length];
-        for (int i = 0; i < text_btn.length; i++) {
-            buttons[i] = new Button(
+    public void addButton (GameStarter game, String text_btn, ClickListener listeners) {
+        for (Button b : buttons) b.get().addAction(Actions.moveBy((-3f/4f)*b.get().getWidth(), 0f));
+        if (buttons.size()  > 0) {
+            buttons.add(new Button(
                     game,
-                    getX()+0.5f*getWidth()-(text_btn.length%2==0?(text_btn.length/2-i)*0.21f*getWidth():(text_btn.length/2-i)*0.21f*getWidth()+0.1f*getWidth()),
+                    buttons.get(buttons.size() - 1).get().getX() + 1.5f * buttons.get(buttons.size() - 1).get().getWidth(),
                     getY() + 0.05f * getWidth(),
                     0.2f * getWidth(),
                     game.fonts.f_15.getFont(),
-                    game.textSystem.get(text_btn[i]),
+                    game.textSystem.get(text_btn),
                     1,
-                    "dialog_btn_" + (i + 1)
-            );
-            buttons[i].get().addListener(listeners[i]);
+                    "dialog_btn_" + buttons.size()
+            ));
+            buttons.get(buttons.size() - 1).get().addListener(listeners);
+        } else {
+            buttons.add(new Button(
+                    game,
+                    getX() + .4f*getWidth(),
+                    getY() + .05f * getWidth(),
+                    .2f * getWidth(),
+                    game.fonts.f_15.getFont(),
+                    game.textSystem.get(text_btn),
+                    1,
+                    "dialog_btn_" + buttons.size()
+            ));
+            buttons.get(buttons.size() - 1).get().addListener(listeners);
         }
     }
 
-    public Button[] getButtons () {
+    public ArrayList<Button> getButtons () {
         return buttons;
     }
 
@@ -103,23 +132,10 @@ public class Dialog extends AdvSprite {
         }
     }
 
-    public void show () {
-        is_displayed = true;
-        setVisible(true);
-        text.setVisible(true);
-        if (picture != null) picture.setVisible(true);
-        for (Button b : buttons) b.get().setVisible(true);
-    }
-    public void hide () {
-        is_displayed = false;
-        setVisible(false);
-        text.setVisible(false);
-        if (picture != null) picture.setVisible(false);
-        for (Button b : buttons) b.get().setVisible(false);
-    }
-
-    public boolean isDisplayed() {
-        return is_displayed;
+    private void close () {
+        text.getParent().removeActor(text);
+        for (Button b : buttons) b.get().getParent().removeActor(b.get());
+        getParent().removeActor(this);
     }
 
     private void update () {

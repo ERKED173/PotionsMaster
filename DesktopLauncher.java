@@ -8,7 +8,7 @@ import ru.erked.pcook.GameStarter;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		/**/
+		/*
 		TexturePacker.Settings settings = new TexturePacker.Settings();
 		settings.maxWidth = 2048;
 		settings.maxHeight = 2048;
@@ -17,7 +17,7 @@ public class DesktopLauncher {
 				"C:/Projects/Java/Potions_Cook/resource",
 				"C:/Projects/Java/Potions_Cook/source/android/assets/textures",
 				"textures");
-		/**/
+		*/
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.height = 700;
 		config.width = (int)(config.height / 1.777778f);

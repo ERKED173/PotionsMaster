@@ -1,5 +1,6 @@
 package ru.erked.pcook.systems;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -13,6 +14,7 @@ public class AdvSprite extends Actor {
     private float p_y;
     private float p_width;
     private float p_height;
+    private boolean p_flipX;
     private boolean p_flipY;
 
     public AdvSprite (Sprite sprite, float x, float y, float width, float height) {
@@ -27,73 +29,110 @@ public class AdvSprite extends Actor {
         drawPartially = false;
     }
 
+    public AdvSprite (AdvSprite copy) {
+        setX(copy.getX());
+        setY(copy.getY());
+        setWidth(copy.getWidth());
+        setHeight(copy.getHeight());
+        setOrigin(getWidth() / 2f, getHeight() / 2f);
+        sprite = new Sprite(copy.sprite);
+        drawPartially = false;
+    }
+
     @Override
     public void draw (Batch batch, float parentAlpha) {
         update();
-        if (drawPartially)
-            drawPart(batch, p_x, p_y, p_width, p_height);
-        else
-            sprite.draw(batch, parentAlpha);
-    }
-
-    private void drawPart (Batch batch, float x, float y, float width, float height) {
-        batch.setColor(sprite.getColor());
-        if (p_flipY) {
-            batch.draw(
-                    sprite.getTexture(),
-                    getX(),
-                    getY() + getHeight() * (1f - height),
-                    getOriginX(),
-                    getOriginY(),
-                    getWidth() * width,
-                    getHeight() * height,
-                    getScaleX(),
-                    getScaleY(),
-                    getRotation(),
-                    (int) (sprite.getRegionX() + sprite.getRegionWidth() * x),
-                    (int) (sprite.getRegionY() + sprite.getRegionHeight() * y),
-                    (int) (sprite.getRegionWidth() * width),
-                    (int) (sprite.getRegionHeight() * height),
-                    sprite.isFlipX(),
-                    sprite.isFlipY()
-            );
+        if (drawPartially) {
+            if (p_flipX && p_flipY) {
+                //drawPartFlipXY(batch, p_x, p_y, p_width, p_height);
+            } else if (p_flipX) {
+                drawPartFlipX(batch, p_x, p_y, p_width, p_height);
+            } else if (p_flipY) {
+                drawPartFlipY(batch, p_x, p_y, p_width, p_height);
+            } else {
+                drawPart(batch, p_x, p_y, p_width, p_height);
+            }
         } else {
-            batch.draw(
-                    sprite.getTexture(),
-                    getX(),
-                    getY(),
-                    getOriginX(),
-                    getOriginY(),
-                    getWidth() * width,
-                    getHeight() * height,
-                    getScaleX(),
-                    getScaleY(),
-                    getRotation(),
-                    (int) (sprite.getRegionX() + sprite.getRegionWidth() * x),
-                    (int) (sprite.getRegionY() + sprite.getRegionHeight() * y + sprite.getRegionHeight() * (1f - height)),
-                    (int) (sprite.getRegionWidth() * width),
-                    (int) (sprite.getRegionHeight() * height),
-                    sprite.isFlipX(),
-                    sprite.isFlipY()
-            );
+            sprite.draw(batch, parentAlpha);
         }
-        batch.setColor(1f, 1f, 1f, 1f);
     }
 
-    public void setDrawPartially (float width, float height, boolean flipY) {
-        p_x = (1f - width)  / 2f;
-        p_y = (1f - height) / 2f;
-        p_width = width;
-        p_height = height;
-        p_flipY = flipY;
-        drawPartially = true;
+    private void drawPartFlipX(Batch batch, float x, float y, float width, float height) {
+        Color old = batch.getColor();
+        batch.setColor(sprite.getColor());
+        batch.draw(
+                sprite.getTexture(),
+                getX() + getWidth() * (1f - width),
+                getY(),
+                getOriginX(),
+                getOriginY(),
+                getWidth() * width,
+                getHeight() * height,
+                getScaleX(),
+                getScaleY(),
+                getRotation(),
+                (int) (sprite.getRegionX() + sprite.getRegionWidth() * x + sprite.getRegionWidth() * (1f - width)),
+                (int) (sprite.getRegionY() + sprite.getRegionHeight() * y),
+                (int) (sprite.getRegionWidth() * width),
+                (int) (sprite.getRegionHeight() * height),
+                sprite.isFlipX(),
+                sprite.isFlipY()
+        );
+        batch.setColor(old);
+    }
+    private void drawPartFlipY(Batch batch, float x, float y, float width, float height) {
+        Color old = batch.getColor();
+        batch.setColor(sprite.getColor());
+        batch.draw(
+                sprite.getTexture(),
+                getX(),
+                getY() + getHeight() * (1f - height),
+                getOriginX(),
+                getOriginY(),
+                getWidth() * width,
+                getHeight() * height,
+                getScaleX(),
+                getScaleY(),
+                getRotation(),
+                (int) (sprite.getRegionX() + sprite.getRegionWidth() * x),
+                (int) (sprite.getRegionY() + sprite.getRegionHeight() * y),
+                (int) (sprite.getRegionWidth() * width),
+                (int) (sprite.getRegionHeight() * height),
+                sprite.isFlipX(),
+                sprite.isFlipY()
+        );
+        batch.setColor(old);
+    }
+    private void drawPart (Batch batch, float x, float y, float width, float height) {
+        Color old = batch.getColor();
+        batch.setColor(sprite.getColor());
+        batch.draw(
+                sprite.getTexture(),
+                getX(),
+                getY(),
+                getOriginX(),
+                getOriginY(),
+                getWidth() * width,
+                getHeight() * height,
+                getScaleX(),
+                getScaleY(),
+                getRotation(),
+                (int) (sprite.getRegionX() + sprite.getRegionWidth() * x),
+                (int) (sprite.getRegionY() + sprite.getRegionHeight() * y + sprite.getRegionHeight() * (1f - height)),
+                (int) (sprite.getRegionWidth() * width),
+                (int) (sprite.getRegionHeight() * height),
+                sprite.isFlipX(),
+                sprite.isFlipY()
+        );
+        batch.setColor(old);
     }
 
-    public void setDrawPartially (float x, float y, float width, float height, boolean flipY) {
+    public void setDrawPartially (float x, float y, float width, float height, boolean flipX, boolean flipY) {
         p_x = x;
         p_y = y;
         p_width = width;
         p_height = height;
+        p_flipX = flipX;
         p_flipY = flipY;
         drawPartially = true;
     }

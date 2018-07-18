@@ -59,6 +59,7 @@ public class Options extends AdvScreen {
 
         if (g.is_music) {
             g.sounds.music_1.setLooping(true);
+            g.sounds.music_1.setVolume(g.music_volume);
             g.sounds.music_1.play();
         }
 
@@ -118,6 +119,11 @@ public class Options extends AdvScreen {
 
         /* ESC listener. */
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) { this.dispose();Gdx.app.exit(); }
+        if (Gdx.input.isKeyPressed(Input.Buttons.BACK)) {
+            change_screen = true;
+            next_screen = new Menu(g);
+            for (Actor act : stage.getActors()) act.addAction(Actions.alpha(0f, 0.5f));
+        }
         //
     }
 
@@ -339,6 +345,7 @@ public class Options extends AdvScreen {
         scroll_m.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (g.is_sound) g.sounds.click.play(g.sound_volume);
                 r_music.setPosition(
                         x - .5f*r_music.getWidth() + scroll_m.getX(),
                         r_music.getY()
@@ -349,6 +356,7 @@ public class Options extends AdvScreen {
         scroll_s.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (g.is_sound) g.sounds.click.play(g.sound_volume);
                 r_sound.setPosition(
                         x - .5f*r_sound.getWidth() + scroll_s.getX(),
                         r_sound.getY()
@@ -373,6 +381,15 @@ public class Options extends AdvScreen {
         stage.addActor(r_sound);
         stage.addActor(text_options);
         //
+    }
+
+    @Override
+    public void resume() {
+        if (g.is_music) {
+            g.sounds.music_1.setLooping(true);
+            g.sounds.music_1.setVolume(g.music_volume);
+            g.sounds.music_1.play();
+        }
     }
 
 }
